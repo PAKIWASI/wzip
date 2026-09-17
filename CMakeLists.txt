@@ -72,6 +72,7 @@ endif()
 
 set(SRC_FILES
     src/wctoolkit.c
+    src/wzip.c
 )
 
 add_executable(main

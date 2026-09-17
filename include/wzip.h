@@ -2,7 +2,6 @@
 #define WZIP_H
 
 #include "views_single.h"
-#include <stdio.h>
 
 
 /*
@@ -24,6 +23,7 @@ typedef enum {
  * Gzip State Machine
 */
 typedef enum {
+    WzNOT_RUNNING = 0,
     WzREAD_HEADER,
     WzREAD_BLOCKS,
     wzREAD_TRAILER,
@@ -98,7 +98,7 @@ typedef struct {
 } WzDecompressor;
 
 
-void wz_create_decompressor(WzDecompressor* dcmpsr, strview filepath);
+void wz_create_decompressor(WzDecompressor* dcmpsr, const char* filepath);
 
 void inflate(WzDecompressor* dcmpsr);
 
