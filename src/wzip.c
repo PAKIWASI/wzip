@@ -62,8 +62,9 @@ void inflate(WzDecompressor* dcmpsr)
         curr = (curr + 1) + (7 & ~7);
     }
 
-    u32 isize = *(u32*)(curr - 8 - 4);
-    u32 crc32 = *(u32*)(curr - 8 - 8);
+    u32 isize, crc32;
+    memcpy(&crc32, curr - 8 - 8, 4);
+    memcpy(&isize, curr - 8 - 4, 4);
 
     printf("%d\n", crc32);
     printf("%d\n", isize);
