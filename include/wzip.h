@@ -23,11 +23,13 @@ typedef enum {
  * Gzip State Machine
 */
 typedef enum {
-    WzNOT_RUNNING = 0,
-    WzREAD_HEADER,
-    WzREAD_BLOCKS,
-    wzREAD_TRAILER,
-} WzState;
+    WzD_NOT_STARTED = 0,
+    WzD_READ_HEADER,
+    WzD_READ_BLOCKS,
+    wzD_READ_TRAILER,
+    wzD_CALC_CRC,
+    wzD_FINISHED,
+} WzDState;
 
 
 /*
@@ -85,7 +87,7 @@ typedef struct {
     u32 output_buf_size;
     // data about the current member we are reading
     GzFlags   flags;
-    WzState   state;
+    WzDState   state;
     GzHeader  header;
     u8        _[6];
     GzTrailer trailer;
