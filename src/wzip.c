@@ -1,4 +1,5 @@
 #include "wzip.h"
+#include "arena_single.h"
 #include "views_single.h"
 
 #include <fcntl.h>
@@ -10,8 +11,8 @@
 
 void wz_create_decompressor(WzDecompressor* dcmpsr, const char* filepath)
 {
-    dcmpsr->input_buf_size  = WZ_DEFAULT_BUF_SIZE;
-    dcmpsr->output_buf_size = WZ_DEFAULT_BUF_SIZE;
+    Arena_create_stk(&dcmpsr->input_buf, WZ_DEFAULT_BUF_SIZE);
+    Arena_create_stk(&dcmpsr->output_buf, WZ_DEFAULT_BUF_SIZE);
 
     dcmpsr->flags = 0;
     dcmpsr->state = WzD_NOT_STARTED;
@@ -26,10 +27,14 @@ void wz_create_decompressor(WzDecompressor* dcmpsr, const char* filepath)
     dcmpsr->uncompressed_data_bytes = 0;
 }
 
+void wz_destroy_decompressor(WzDecompressor* dcmpsr, const char* filepath)
+{
+}
+
 void inflate(WzDecompressor* dcmpsr)
 {
     u8* data = mmap(NULL,                   // let kernel choose address
-                    dcmpsr->input_buf_size, // number of bytes to map
+                    dcmpsr->input_buf.size, // number of bytes to map
                     PROT_READ,              // read-only
                     MAP_PRIVATE,            // private mapping
                     dcmpsr->fd,             // file descriptor

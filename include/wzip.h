@@ -83,11 +83,11 @@ _Static_assert(sizeof(GzTrailer) == 8, "GzTrailer must be 8 bytes");
  */
 typedef struct {
     // decompression configuration
-    u32 input_buf_size;
-    u32 output_buf_size;
+    Arena input_buf;
+    Arena output_buf;
     // data about the current member we are reading
     GzFlags   flags;
-    WzDState   state;
+    WzDState  state;
     GzHeader  header;
     u8        _[6];
     GzTrailer trailer;
@@ -101,6 +101,8 @@ typedef struct {
 
 
 void wz_create_decompressor(WzDecompressor* dcmpsr, const char* filepath);
+
+void wz_destroy_decompressor(WzDecompressor* dcmpsr, const char* filepath);
 
 void inflate(WzDecompressor* dcmpsr);
 
