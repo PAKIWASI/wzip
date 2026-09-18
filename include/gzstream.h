@@ -5,21 +5,32 @@
 #include <stddef.h>
 
 
-
 typedef struct {
-    const u8* data;
-    size_t    size;    // total bytes available
-    size_t    bytepos; // next byte to pull from
+    const u8* stream;  // pointer to the data (can by mmap ptr)
+    u64       size;    // total bytes available
+    u64       bytepos; // next byte to pull from
     u32       bitbuf;  // bits currently held
     int       bitcnt;  // how many bits are valid in bitbuf
     int       error;   // sticky error flag
-} BitReader;
+} WzBitReader;
+
+
+
+void wz_bitreader_create(WzBitReader* wzbr);
 
 // LSB-first: DEFLATE's ordering for all values except Huffman codes
-static inline u32  bitreader_peek(BitReader* br, int n); // look at n bits, don't consume
-static inline void bitreader_consume(BitReader* br, int n);
-static inline u32  bitreader_read(BitReader* br, int n); // peek + consume
-static inline void bitreader_align_byte(BitReader* br);  // discard bits to next byte boundary
+
+// look at n bits, don't consume
+u32 wz_bitreader_peek(WzBitReader* wzbr, int n);
+
+// consume n bits from the stream
+void wz_bitreader_take(WzBitReader* wzbr, int n);
+
+// peek + consume
+u32 wz_bitreader_read(WzBitReader* wzbr, int n);
+
+// discard bits to next byte boundary
+void wz_bitreader_align_byte(WzBitReader* wzbr);
 
 
 /*
@@ -29,8 +40,7 @@ The standard trick (zlib, libdeflate, miniz) is to pre-reverse the Huffman table
 u16 idx = (u16)(bitbuf >> (bitcnt - FASTBITS));   // top FASTBITS bits
 entry = table[idx];                               // no reversal anywhere
 
-
-That shifts all reversal cost to table construction (once per block) and removes it from the per-symbol path entirely. This is what production decoders do. If you're optimizing, this is the win — not making reverse_u16 faster.
+That shifts all reversal cost to table construction (once per block) and removes it from the per-symbol path entirely. This is what production decoders do.
 */
 
 #endif // GZSTREAM_H
